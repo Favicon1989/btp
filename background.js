@@ -1,5 +1,46 @@
 var domainsMap = {};
 
+var menuItem = {
+    "id": "BTP",
+    "title": "BTP check",
+    "contexts": ["selection"]
+};
+
+chrome.contextMenus.create(menuItem);
+
+function fixedEncodeURI (str) {
+    return encodeURI(str).replace(/%5B/g, '[').replace(/%5D/g, ']');
+}
+
+chrome.contextMenus.onClicked.addListener(function (clickData) {
+    if (clickData.menuItemId === "BTP" && clickData.selectionText) {
+        let hostname = extractHostname(clickData.selectionText);
+        if (blacklistContains(hostname + ".")) {
+            var notifOptions = {
+                type: "basic",
+                iconUrl: "icon.png",
+                title: "Malware site.",
+                message: "This url is malicious."
+            };
+
+            chrome.notifications.clear('detectNotification');
+            chrome.notifications.create('detectNotification', notifOptions);
+
+            var wikiUrl = "https://en.wikipedia.org/wiki/" + fixedEncodeURI(clickData.selectionText);
+            var createData = {
+                "url": wikiUrl,
+                "type": "popup",
+                "top": 5,
+                "left": 5,
+                "width": parseInt(screen.availWidth/2),
+                "height": parseInt(screen.availHeight/2)
+            };
+            chrome.windows.create(createData, function(){});
+
+        }
+    }
+});
+
 // load badge properties
 chrome.browserAction.setBadgeBackgroundColor({color: "red"});
 
@@ -72,7 +113,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
             type: "basic",
             iconUrl: "icon.png",
             title: "Malware site.",
-            message: "This url is malicious. There for you've benn redirected to the experts."
+            message: "This url is malicious. You've been redirected to the experts."
         };
 
         chrome.notifications.clear('redirectNotification');

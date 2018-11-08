@@ -18,7 +18,8 @@
     "tabs",
     "webRequestBlocking",
     "storage",
-    "notifications"
+    "notifications",
+    "contextMenus"
   ],
   "background": {
     "scripts": [
