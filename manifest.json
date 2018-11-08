@@ -17,6 +17,7 @@
     "<all_urls>",
     "tabs",
     "webRequestBlocking",
+    "webRequest",
     "storage",
     "notifications",
     "contextMenus"
@@ -27,7 +28,7 @@
       "jquery-3.1.0.min.js",
       "background.js"
     ],
-    "persistent": false
+    "persistent": true
   },
   "options_page": "options.html"
 }

@@ -10,7 +10,7 @@ chrome.contextMenus.removeAll(function () {
     chrome.contextMenus.create(menuItem);
 });
 
-function fixedEncodeURI (str) {
+function fixedEncodeURI(str) {
     return encodeURI(str).replace(/%5B/g, '[').replace(/%5D/g, ']');
 }
 
@@ -34,10 +34,11 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
                 "type": "popup",
                 "top": 5,
                 "left": 5,
-                "width": parseInt(screen.availWidth/2),
-                "height": parseInt(screen.availHeight/2)
+                "width": parseInt(screen.availWidth / 2),
+                "height": parseInt(screen.availHeight / 2)
             };
-            chrome.windows.create(createData, function(){});
+            chrome.windows.create(createData, function () {
+            });
 
         }
     }
@@ -100,37 +101,42 @@ var blacklistContains = function (value) {
 };
 
 // listen to the link changes in all the tabs
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    let hostname = extractHostname(tab.url);
-    if (tab.url && blacklistContains(hostname + ".")) {
+chrome.webRequest.onBeforeRequest.addListener(function (details) {
+        var hostname = new URL(details.url).hostname;
+        if (hostname.startsWith("www.")) hostname = hostname.substring(4);
+        if (hostname && details.tabId && blacklistContains(hostname + ".")) {
 
-        updateProperties = {};
-        updateProperties.url = 'https://www.akamai.com/';
-        chrome.tabs.update(tabId, updateProperties, function () {
+            updateProperties = {};
+            updateProperties.url = 'https://www.akamai.com/';
+            chrome.tabs.update(details.tabId, updateProperties, function () {
+            });
 
-        });
+            // create notification
+            var notifOptions = {
+                type: "basic",
+                iconUrl: "icon.png",
+                title: "Malware site.",
+                message: "This url is malicious. You've been redirected to the experts."
+            };
 
-        // create notification
-        var notifOptions = {
-            type: "basic",
-            iconUrl: "icon.png",
-            title: "Malware site.",
-            message: "This url is malicious. You've been redirected to the experts."
-        };
+            chrome.notifications.clear('redirectNotification');
+            chrome.notifications.create('redirectNotification', notifOptions);
 
-        chrome.notifications.clear('redirectNotification');
-        chrome.notifications.create('redirectNotification', notifOptions);
+            chrome.storage.sync.get('alertsCount', function (storage) {
+                if (!storage.alertsCount) {
+                    chrome.storage.sync.set({'alertsCount': 1}, function () {
+                    });
+                } else {
+                    chrome.storage.sync.set({'alertsCount': storage.alertsCount + 1}, function () {
+                    });
+                }
+            });
+            db.domains.add({name: hostname, detectionDate: new Date().toISOString().substring(0, 10)}).then(function () {
+            })
+        }
+    },
+    {urls: ["<all_urls>"]},
+    ["blocking"]);
 
-        chrome.storage.sync.get('alertsCount', function (storage) {
-            if (!storage.alertsCount) {
-                chrome.storage.sync.set({'alertsCount': 1}, function () {
-                });
-            } else {
-                chrome.storage.sync.set({'alertsCount': storage.alertsCount + 1}, function () {
-                });
-            }
-        });
-        db.domains.add({name: hostname, detectionDate: new Date().toISOString().substring(0, 10)}).then(function () {
-        })
-    }
-});
+
+
