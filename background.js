@@ -6,7 +6,9 @@ var menuItem = {
     "contexts": ["selection"]
 };
 
-chrome.contextMenus.create(menuItem);
+chrome.contextMenus.removeAll(function () {
+    chrome.contextMenus.create(menuItem);
+});
 
 function fixedEncodeURI (str) {
     return encodeURI(str).replace(/%5B/g, '[').replace(/%5D/g, ']');
