@@ -22,10 +22,29 @@ function GetRequests(tabId) {
     return { "made": requestsMade[tabId.toString()], "blocked": requestsBlocked[tabId.toString()] };
 }
 
+// save new manual domain
+function Save(newDomains) {
+    newDomains.forEach(dom => {
+        delete domainsMap[dom];
+        domainsMap[dom] = true;
+    })
+}
+
+// delete some domain from the list
+function Delete(domainsForDeletion) {
+    domainsForDeletion.forEach(dom => {
+        delete domainsMap[dom];
+    });
+}
+
 // get all requests from current active tab
 chrome.runtime.onMessage.addListener(function (request, sender, callback) {
     if (request.action === "requests") {
         callback(GetRequests(request.tab));
+    } else if (request.action === "save") {
+        callback(Save(request.newDomains));
+    } else if (request.action === "delete") {
+        callback(Delete(request.domainsForDeletion));
     }
 });
 
