@@ -86,12 +86,12 @@ $(function () {
         );
     });
 
-    db.domains.where("detectionDate").equals(new Date().toISOString().substring(0, 10)).toArray().then(function (domains) {
-        let out = domains.map((dom) => {
-             return '<li>' + dom.name + '</li>';
-        });
-        $('#listView').html(out);
-    });
+    // db.domains.where("detectionDate").equals(new Date().toISOString().substring(0, 10)).toArray().then(function (domains) {
+    //     let out = domains.map((dom) => {
+    //          return '<li>' + dom.name + '</li>';
+    //     });
+    //     $('#listView').html(out);
+    // });
 
     chrome.storage.sync.get('alertsCount', function (storage) {
         if (storage.alertsCount) {
