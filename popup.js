@@ -19,10 +19,21 @@ $(function () {
             },
             function (value) {
                 requestedDomains = value.made;
-                let outRequestedDomains = requestedDomains.map((dom) => {
-                    return '<ul><li>' + dom + '</li></ul>';
-                });
-                $('#requestedListView').html(outRequestedDomains);
+                if (requestedDomains) {
+
+                    let outRequestedDomains = requestedDomains.map((dom) => {
+                        let checkbox;
+                        if (dom.isBlocked) {
+                            checkbox = '<input type="checkbox" checked>';
+                        } else {
+                            checkbox = '<input type="checkbox">';
+                        }
+
+                        return '<ul><li>' + dom.domain + checkbox + '</li></ul>';
+                    });
+                    $('#requestedListView').html(outRequestedDomains);
+                }
+
             }
         );
     });

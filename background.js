@@ -141,12 +141,17 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
             requestsBlocked[details.tabId.toString()] = [];
         }
 
-        // Add to list
-        if (details.tabId.toString() !== "-1" && requestsMade[details.tabId.toString()].indexOf(hostname) === -1) {
-            requestsMade[details.tabId.toString()][requestsMade[details.tabId.toString()].length] = hostname;
-        }
-
         if (hostname && details.tabId && blacklistContains(hostname + ".")) {
+
+            // Add to list
+            if (details.tabId.toString() !== "-1" && !requestsMade[details.tabId.toString()].find(obj => {
+                return obj.domain === hostname
+            })) {
+                requestsMade[details.tabId.toString()][requestsMade[details.tabId.toString()].length] = {
+                    domain: hostname,
+                    isBlocked: true
+                };
+            }
 
             updateProperties = {};
             updateProperties.url = 'https://www.akamai.com/';
@@ -182,7 +187,18 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
                 }
             });
             db.domains.add({name: hostname, detectionDate: new Date().toISOString().substring(0, 10)}).then(function () {
-            })
+            });
+        } else {
+            // Add to list
+            if (details.tabId.toString() !== "-1" && !requestsMade[details.tabId.toString()].find(obj => {
+                return obj.domain === hostname
+            })) {
+                requestsMade[details.tabId.toString()][requestsMade[details.tabId.toString()].length] = {
+                    domain: hostname,
+                    isBlocked: false
+                };
+            }
+
         }
     },
     {urls: ["<all_urls>"]},
