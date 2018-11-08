@@ -1,4 +1,33 @@
 var domainsMap = {};
+var requestsMade = {};
+var requestsBlocked = {};
+
+// on create clean
+chrome.tabs.onCreated.addListener(function (details) {
+    if (details.id) {
+        requestsMade[details.id.toString()] = [];
+        requestsBlocked[details.id.toString()] = [];
+    }
+});
+
+// on remove clean
+chrome.tabs.onRemoved.addListener(function (details) {
+    if (details) {
+        requestsMade[details.toString()] = [];
+        requestsBlocked[details.toString()] = [];
+    }
+});
+
+function GetRequests(tabId) {
+    return { "made": requestsMade[tabId.toString()], "blocked": requestsBlocked[tabId.toString()] };
+}
+
+// get all requests from current active tab
+chrome.runtime.onMessage.addListener(function (request, sender, callback) {
+    if (request.action === "requests") {
+        callback(GetRequests(request.tab));
+    }
+});
 
 var menuItem = {
     "id": "BTP",
@@ -104,12 +133,33 @@ var blacklistContains = function (value) {
 chrome.webRequest.onBeforeRequest.addListener(function (details) {
         var hostname = new URL(details.url).hostname;
         if (hostname.startsWith("www.")) hostname = hostname.substring(4);
+
+        // If this was first tab, tabs.onCreated would not have been called. So, there won't be anything
+        // in requestMade and requestsBlocked.
+        if (details.tabId.toString() !== "-1" && !requestsMade.hasOwnProperty(details.tabId.toString())) {
+            requestsMade[details.tabId.toString()] = [];
+            requestsBlocked[details.tabId.toString()] = [];
+        }
+
+        // Add to list
+        if (details.tabId.toString() !== "-1" && requestsMade[details.tabId.toString()].indexOf(hostname) === -1) {
+            requestsMade[details.tabId.toString()][requestsMade[details.tabId.toString()].length] = hostname;
+        }
+
         if (hostname && details.tabId && blacklistContains(hostname + ".")) {
 
             updateProperties = {};
             updateProperties.url = 'https://www.akamai.com/';
             chrome.tabs.update(details.tabId, updateProperties, function () {
             });
+
+            // counter for blocked
+            if (requestsBlocked[details.tabId.toString()][hostname]) {
+                requestsBlocked[details.tabId.toString()][hostname] = requestsBlocked[details.tabId.toString()][hostname] + 1;
+            } else {
+                requestsBlocked[details.tabId.toString()][hostname] = 0;
+            }
+
 
             // create notification
             var notifOptions = {
