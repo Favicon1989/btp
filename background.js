@@ -1,12 +1,11 @@
 var domainsMap = {};
 var requestsMade = {};
-var requestsBlocked = {};
+var manualBlocks = {};
 
 // on create new tab
 chrome.tabs.onCreated.addListener(function (details) {
     if (details.id) {
         requestsMade[details.id.toString()] = [];
-        requestsBlocked[details.id.toString()] = [];
     }
 });
 
@@ -14,13 +13,8 @@ chrome.tabs.onCreated.addListener(function (details) {
 chrome.tabs.onRemoved.addListener(function (details) {
     if (details) {
         requestsMade[details.toString()] = [];
-        requestsBlocked[details.toString()] = [];
     }
 });
-
-function GetRequests(tabId) {
-    return {"made": requestsMade[tabId.toString()], "blocked": requestsBlocked[tabId.toString()]};
-}
 
 function unique(arr, tailLength) {
     if (!arr) return [];
@@ -35,6 +29,10 @@ function unique(arr, tailLength) {
         }
     }
     return a;
+}
+
+function GetManual() {
+    return {"made": Object.keys(manualBlocks)};
 }
 
 // get last 10 requests
@@ -52,6 +50,7 @@ function Save(newDomains, tabId) {
     newDomains.forEach(dom => {
         delete domainsMap[dom];
         domainsMap[dom] = true;
+        manualBlocks[dom] = true;
     })
 }
 
@@ -59,6 +58,7 @@ function Save(newDomains, tabId) {
 function Delete(domainsForDeletion) {
     domainsForDeletion.forEach(dom => {
         delete domainsMap[dom];
+        delete manualBlocks[dom]
     });
 }
 
@@ -76,8 +76,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, callback) {
         callback(Save(request.newDomains));
     } else if (request.action === "delete") {
         callback(Delete(request.domainsForDeletion));
-    } else if (request.action === "contains") {
-        callback(Check(request.domainsForCheck));
+    } else if (request.action === "manual") {
+        callback(GetManual());
     }
 });
 
@@ -200,10 +200,6 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
         // in requestMade and requestsBlocked.
         if (details.tabId.toString() !== "-1" && !requestsMade.hasOwnProperty(details.tabId.toString())) {
             requestsMade[details.tabId.toString()] = [];
-        }
-
-        if (details.tabId.toString() !== "-1" && !requestsBlocked.hasOwnProperty(details.tabId.toString())) {
-            requestsBlocked[details.tabId.toString()] = [];
         }
 
         if (hostname && details.tabId && blacklistContains(hostname + ".")) {
