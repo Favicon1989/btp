@@ -1,22 +1,42 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>BTP</title>
-        <script src="dexie.js"></script>
-        <script src="jquery-3.1.0.min.js"></script>
-        <script src="popup.js"></script>
-    </head>
-    <body>
-        <h1>Recent Malicious Domains</h1>
-        <h2>Total: <span id="total">0</span></h2>
+<head>
+    <title>BTP</title>
+    <link rel="stylesheet" href="popup.css">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <script src="dexie.js"></script>
+    <script src="jquery-3.1.0.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script src="popup.js"></script>
+</head>
+<body>
+<div class="shadow">
+    <div class="container">
+        <div id="popupHeader">
+            <div class="page-header">
+                <h2>BTP</h2>
+                <h5>Total malicious visits for <span id="todaysDate"></span>:</h5>
+                <h5><span id="total" style="font-weight: bold; font-size: large; color: #ca0b00">0</span></h5>
+            </div>
+            <h5>Latest 10 Visited Domains In This Tab</h5>
 
-        Malicious Domains from today
-        <div id="listView"></div>
-        Requested Domains By This Tab
-        <div>
-            <button id="yes">Yes</button>
-            <button id="no">No</button>
+            <div id="listView"></div>
+
+            <div style="text-align: center">
+
+                <div class="btn-group">
+                    <button id="yes" class="btn btn-warning btn-xs">Apply Changes</button>
+                    <button id="no" class="btn btn-primary btn-xs">Cancel</button>
+                </div>
+            </div>
+            <div style="height: 1ch"></div>
+
+            <div>
+                <ul class="list-group list-group-flush no-border" style="line-height: 1ch" id="requestedListView"></ul>
+            </div>
         </div>
-        <div id="requestedListView"></div>
-    </body>
+
+    </div>
+</div>
+</body>
 </html>

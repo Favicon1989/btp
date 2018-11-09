@@ -2,7 +2,7 @@ var domainsMap = {};
 var requestsMade = {};
 var requestsBlocked = {};
 
-// on create clean
+// on create new tab
 chrome.tabs.onCreated.addListener(function (details) {
     if (details.id) {
         requestsMade[details.id.toString()] = [];
@@ -10,7 +10,7 @@ chrome.tabs.onCreated.addListener(function (details) {
     }
 });
 
-// on remove clean
+// on close tab
 chrome.tabs.onRemoved.addListener(function (details) {
     if (details) {
         requestsMade[details.toString()] = [];
@@ -19,11 +19,36 @@ chrome.tabs.onRemoved.addListener(function (details) {
 });
 
 function GetRequests(tabId) {
-    return { "made": requestsMade[tabId.toString()], "blocked": requestsBlocked[tabId.toString()] };
+    return {"made": requestsMade[tabId.toString()], "blocked": requestsBlocked[tabId.toString()]};
 }
 
-// save new manual domain
-function Save(newDomains) {
+function unique(arr, tailLength) {
+    var z = 0;
+    var u = {}, a = [];
+    for (var i = arr.length - 1; i > 0; i--) {
+        if (z > tailLength) return a;
+        if (!u.hasOwnProperty(arr[i])) {
+            a.push(arr[i]);
+            u[arr[i]] = 1;
+            z++;
+        }
+    }
+    return a;
+}
+
+// get last 10 requests
+function GetLast10UniqueRequests(tabId) {
+    let currentTabRequests = requestsMade[tabId.toString()];
+    var last10unique = unique(currentTabRequests, 10);
+
+    return {
+        "made": Check(last10unique),
+        "blocked": requestsBlocked[tabId.toString()].slice(Math.max(requestsBlocked[tabId.toString()].length - 10, 0))
+    };
+}
+
+// save changes from the popup
+function Save(newDomains, tabId) {
     newDomains.forEach(dom => {
         delete domainsMap[dom];
         domainsMap[dom] = true;
@@ -37,14 +62,22 @@ function Delete(domainsForDeletion) {
     });
 }
 
-// get all requests from current active tab
+function Check(domainsForCheck) {
+    return domainsForCheck.map(dom => {
+        return {domain: dom, isBlocked: blacklistContains(dom + ".")};
+    });
+}
+
+// receive messages from popup
 chrome.runtime.onMessage.addListener(function (request, sender, callback) {
     if (request.action === "requests") {
-        callback(GetRequests(request.tab));
+        callback(GetLast10UniqueRequests(request.tab));
     } else if (request.action === "save") {
         callback(Save(request.newDomains));
     } else if (request.action === "delete") {
         callback(Delete(request.domainsForDeletion));
+    } else if (request.action === "contains") {
+        callback(Check(request.domainsForCheck));
     }
 });
 
@@ -88,6 +121,16 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
             chrome.windows.create(createData, function () {
             });
 
+        } else {
+            var notifOptions2 = {
+                type: "basic",
+                iconUrl: "icon.png",
+                title: "Malware site.",
+                message: "This url is fine."
+            };
+
+            chrome.notifications.clear('detectNotification2');
+            chrome.notifications.create('detectNotification2', notifOptions2);
         }
     }
 });
@@ -157,33 +200,23 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
         // in requestMade and requestsBlocked.
         if (details.tabId.toString() !== "-1" && !requestsMade.hasOwnProperty(details.tabId.toString())) {
             requestsMade[details.tabId.toString()] = [];
+        }
+
+        if (details.tabId.toString() !== "-1" && !requestsBlocked.hasOwnProperty(details.tabId.toString())) {
             requestsBlocked[details.tabId.toString()] = [];
         }
 
         if (hostname && details.tabId && blacklistContains(hostname + ".")) {
 
             // Add to list
-            if (details.tabId.toString() !== "-1" && !requestsMade[details.tabId.toString()].find(obj => {
-                return obj.domain === hostname
-            })) {
-                requestsMade[details.tabId.toString()][requestsMade[details.tabId.toString()].length] = {
-                    domain: hostname,
-                    isBlocked: true
-                };
+            if (details.tabId.toString() !== "-1" && !requestsMade[details.tabId.toString()][hostname]) {
+                requestsMade[details.tabId.toString()][requestsMade[details.tabId.toString()].length] = hostname
             }
 
             updateProperties = {};
             updateProperties.url = 'https://www.akamai.com/';
             chrome.tabs.update(details.tabId, updateProperties, function () {
             });
-
-            // counter for blocked
-            if (requestsBlocked[details.tabId.toString()][hostname]) {
-                requestsBlocked[details.tabId.toString()][hostname] = requestsBlocked[details.tabId.toString()][hostname] + 1;
-            } else {
-                requestsBlocked[details.tabId.toString()][hostname] = 0;
-            }
-
 
             // create notification
             var notifOptions = {
@@ -209,13 +242,8 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
             });
         } else {
             // Add to list
-            if (details.tabId.toString() !== "-1" && !requestsMade[details.tabId.toString()].find(obj => {
-                return obj.domain === hostname
-            })) {
-                requestsMade[details.tabId.toString()][requestsMade[details.tabId.toString()].length] = {
-                    domain: hostname,
-                    isBlocked: false
-                };
+            if (details.tabId.toString() !== "-1" && !requestsMade[details.tabId.toString()][hostname]) {
+                requestsMade[details.tabId.toString()][requestsMade[details.tabId.toString()].length] = hostname
             }
 
         }
