@@ -23,6 +23,7 @@ function GetRequests(tabId) {
 }
 
 function unique(arr, tailLength) {
+    if (!arr) return [];
     var z = 0;
     var u = {}, a = [];
     for (var i = arr.length - 1; i > 0; i--) {
@@ -42,8 +43,7 @@ function GetLast10UniqueRequests(tabId) {
     var last10unique = unique(currentTabRequests, 10);
 
     return {
-        "made": Check(last10unique),
-        "blocked": requestsBlocked[tabId.toString()].slice(Math.max(requestsBlocked[tabId.toString()].length - 10, 0))
+        "made": Check(last10unique)
     };
 }
 
