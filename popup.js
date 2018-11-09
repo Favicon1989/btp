@@ -82,6 +82,7 @@ $(function () {
     }
 
     function No() {
+        chrome.tabs.create({url: chrome.runtime.getURL("options.html")});
         window.close();
     }
 
