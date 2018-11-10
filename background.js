@@ -175,6 +175,8 @@ var db = new Dexie("alertsDB");
 //     alert("Could not delete database");
 // }).finally(() => {
 // });
+// db = new Dexie("alertsDB");
+
 db.version(1).stores({
     domains: "++id,name,detectionDate,category"
 });
