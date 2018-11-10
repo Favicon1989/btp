@@ -294,6 +294,17 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
                     });
                 }
             });
+            if (!category.startsWith("Manual")) {
+                chrome.storage.sync.get('notManualAlertsCount', function (storage) {
+                    if (!storage.notManualAlertsCount) {
+                        chrome.storage.sync.set({'notManualAlertsCount': 1}, function () {
+                        });
+                    } else {
+                        chrome.storage.sync.set({'notManualAlertsCount': storage.notManualAlertsCount + 1}, function () {
+                        });
+                    }
+                });
+            }
             db.domains.add({name: hostname, detectionDate: new Date().toISOString().substring(0, 10), category: category}).then(function () {
             });
         } else {

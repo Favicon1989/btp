@@ -105,5 +105,10 @@ $(function () {
             $('#total').text(storage.alertsCount);
         }
     });
+    chrome.storage.sync.get('notManualAlertsCount', function (storage) {
+        if (storage.notManualAlertsCount) {
+            $('#notManualTotal').text(storage.notManualAlertsCount);
+        }
+    });
 
 });
