@@ -1,5 +1,5 @@
 body {
-    font-family: arial, serif;
+    font-family: Ubuntu, Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 14px;
     margin: 0;
     padding: 0;
@@ -8,17 +8,17 @@ body {
     background-color: lightgrey;
 }
 
-
-
 h1, h2, h3, h4, h5, h6 {
     text-align: center;
 }
 div.counters {
-    text-align: left;
+  text-align: left;
+  padding-left: 15px;
 }
 
 div.page-header {
-    color: #06477D;;
+    font-family: Ubuntu, Helvetica, Arial, "Lucida Grande", sans-serif;
+    color: rgb(0, 115, 153);
 }
 
 .no-border li {
