@@ -14,26 +14,32 @@
     <div class="container">
         <div id="popupHeader">
             <div class="page-header">
-                <h2>BTP</h2>
-                <h5>Total malicious visits for <span id="todaysDate"></span>:</h5>
-                <h5><span id="total" style="font-weight: bold; font-size: large; color: #ca0b00">0</span></h5>
+                <h3><img src="icon.png" width="60" height="60" style="float: left; text-align: left;" > Browser Threat Protector</span> </h3>
             </div>
-            <h5>Latest 10 Visited Domains In This Tab</h5>
+            <div class="counters">
+                <h5><span id="total" style="font-weight: bold; font-size: large; padding-right: 5px; color: #ca0b00">0</span> </span>  malicious sites blocked in total</h5>
+                <h5><span id="totalbyAkamai" style="font-weight: bold; font-size: large; padding-right: 5px; color: #ca0b00">1</span> </span>  by Akamai intelligence</h5>
+            </div>
 
-            <div id="listView"></div>
+            <div class="page-header">
+                <h5>Block or unblock on this page:</h5>
+                <div id="listView"></div>
 
-            <div style="text-align: center">
-
-                <div class="btn-group">
-                    <button id="yes" class="btn btn-warning btn-xs">Apply Changes</button>
-                    <button id="no" class="btn btn-primary btn-xs">Show More</button>
+                <div style="text-align: center">
+                    <div class="btn-group">
+                        <button id="yes" class="btn btn-warning btn-xs">Apply Changes</button>
+                        <button id="no" class="btn btn-primary btn-xs">Show More</button>
+                    </div>
                 </div>
-            </div>
-            <div style="height: 1ch"></div>
+                <div style="height: 1ch"></div>
 
-            <div>
-                <ul class="list-group list-group-flush no-border" style="line-height: 1ch" id="requestedListView"></ul>
+                <div>
+                    <ul class="list-group list-group-flush no-border" style="line-height: 1ch" id="requestedListView"></ul>
+                </div>
+
             </div>
+
+
         </div>
 
     </div>

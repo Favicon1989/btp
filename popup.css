@@ -3,13 +3,22 @@ body {
     font-size: 14px;
     margin: 0;
     padding: 0;
-    color: #06477D;
+    color: #06477D;;
     width: 350px;
     background-color: lightgrey;
 }
 
+
+
 h1, h2, h3, h4, h5, h6 {
     text-align: center;
+}
+div.counters {
+    text-align: left;
+}
+
+div.page-header {
+    color: #06477D;;
 }
 
 .no-border li {
