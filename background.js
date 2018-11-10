@@ -157,7 +157,15 @@ chrome.contextMenus.onClicked.addListener(function (clickData) {
 chrome.browserAction.setBadgeBackgroundColor({color: "red"});
 
 chrome.storage.onChanged.addListener(function (changes) {
-    chrome.browserAction.setBadgeText({"text": changes.alertsCount.newValue.toString()});
+    if (!!changes.alertsCount && !!changes.alertsCount.newValue) {
+        chrome.browserAction.setBadgeText({"text": changes.alertsCount.newValue.toString()});
+    }
+});
+
+// clean local storage
+chrome.storage.sync.remove('notManualAlertsCount', function () {
+});
+chrome.storage.sync.remove('alertsCount', function () {
 });
 
 chrome.storage.sync.get('alertsCount', function (storage) {
@@ -167,8 +175,7 @@ chrome.storage.sync.get('alertsCount', function (storage) {
 });
 var db = new Dexie("alertsDB");
 
-// for db recreation
-
+// clean db
 db.delete().then(() => {
     alert("Database successfully deleted");
 }).catch((err) => {
