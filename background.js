@@ -72,7 +72,7 @@ function Delete(domainsForDeletion) {
 
 function Check(domainsForCheck) {
     return domainsForCheck.map(dom => {
-        return {domain: dom, isBlocked: blacklistContains(dom + ".")};
+        return {domain: dom, isBlocked: !!blacklistContains(dom + ".")};
     });
 }
 
@@ -114,11 +114,13 @@ function fixedEncodeURI(str) {
 chrome.contextMenus.onClicked.addListener(function (clickData) {
     if (clickData.menuItemId === "BTP" && clickData.selectionText) {
         let hostname = extractHostname(clickData.selectionText);
-        if (blacklistContains(hostname + ".")) {
+        let category = blacklistContains(hostname + ".");
+        if (!!category) {
+            let categoryUI = category;
             var notifOptions = {
                 type: "basic",
                 iconUrl: "icon.png",
-                title: "Malware site.",
+                title: categoryUI + " site.",
                 message: "This url is malicious."
             };
 
@@ -174,18 +176,21 @@ var db = new Dexie("alertsDB");
 // }).finally(() => {
 // });
 db.version(1).stores({
-    domains: "++id,name,detectionDate"
+    domains: "++id,name,detectionDate,category"
 });
 
 // read from file into lines
 function readFromFile() {
     chrome.runtime.getPackageDirectoryEntry(function (root) {
-        root.getFile("domains.dat", {}, function (fileEntry) {
+        root.getFile("domains_1.dat", {}, function (fileEntry) {
             fileEntry.file(function (file) {
                 var reader = new FileReader();
                 reader.onloadend = function (e) {
                     var lines = e.target.result.split('\n');
-                    lines.forEach(dom => domainsMap[dom] = true);
+                    lines.forEach(dom => {
+                        let domainAndCategory = dom.split(" ");
+                        domainsMap[domainAndCategory[0]] = domainAndCategory[1]
+                    });
                 };
                 reader.readAsText(file);
             });
@@ -220,8 +225,26 @@ function extractHostname(url) {
 }
 
 var blacklistContains = function (value) {
-    return (domainsMap[value] === true || manualBlocks[value] === true) && !manualWhitelist[value];
+    if (!!domainsMap[value] && !manualWhitelist[value]) {
+        return getCategoryName(domainsMap[value]);
+    } else if (manualBlocks[value] === true && !manualWhitelist[value]) {
+        return "Manually added";
+    } else {
+        return null;
+    }
 };
+
+function getCategoryName(categoryId) {
+    if (categoryId === "2") {
+        return "Phishing";
+    }
+    if (categoryId === "1") {
+        return "Malware";
+    }
+    else {
+        return "Unknown";
+    }
+}
 
 // listen to the link changes in all the tabs
 chrome.webRequest.onBeforeRequest.addListener(function (details) {
@@ -234,7 +257,9 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
             requestsMade[details.tabId.toString()] = [];
         }
 
-        if (hostname && details.tabId && blacklistContains(hostname + ".")) {
+        if (hostname && details.tabId && !!blacklistContains(hostname + ".")) {
+
+            let category = blacklistContains(hostname + ".");
 
             // Add to list
             if (details.tabId.toString() !== "-1" && !requestsMade[details.tabId.toString()][hostname]) {
@@ -269,7 +294,7 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
                     });
                 }
             });
-            db.domains.add({name: hostname, detectionDate: new Date().toISOString().substring(0, 10)}).then(function () {
+            db.domains.add({name: hostname, detectionDate: new Date().toISOString().substring(0, 10), category: category}).then(function () {
             });
         } else {
             // Add to list

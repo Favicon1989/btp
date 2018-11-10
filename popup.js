@@ -88,7 +88,7 @@ $(function () {
 
     var db = new Dexie("alertsDB");
     db.version(1).stores({
-        domains: "++id,name,detectionDate"
+        domains: "++id,name,detectionDate,category"
     });
 
     render();

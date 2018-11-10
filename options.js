@@ -191,7 +191,7 @@ $(function () {
     // STATISTIC table
     var db = new Dexie("alertsDB");
     db.version(1).stores({
-        domains: "++id,name,detectionDate"
+        domains: "++id,name,detectionDate,category"
     });
 
     db.domains.toArray().then(function (domains) {
@@ -199,13 +199,19 @@ $(function () {
 
         for (var i = 0; i < domains.length; i++) {
             var name = domains[i].name;
-            counts[name] = counts[name] ? counts[name] + 1 : 1;
+            if (!!counts[name]) {
+                counts[name].count = counts[name].count + 1;
+            } else {
+                counts[name] = {};
+                counts[name].count = 1;
+            }
+            counts[name].category = domains[i].category;
         }
 
         let out = [];
         for (var domainName in counts) {
             if (counts.hasOwnProperty(domainName)) {
-                out.push([domainName, counts[domainName]])
+                out.push([domainName, counts[domainName].count, counts[domainName].category])
             }
         }
 
@@ -214,7 +220,7 @@ $(function () {
         });
 
         $('#statisticListTableBody').html(out.map(statisticObj => {
-            return '<tr><td>' + statisticObj[0] + '</td><td>' + statisticObj[1] + '</td></tr>';
+            return '<tr><td>' + statisticObj[0] + '</td><td>' + statisticObj[1] + '</td><td>' + statisticObj[2] + '</td><td><a href="#"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td></tr>';
         }));
     });
 });
