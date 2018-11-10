@@ -90,7 +90,6 @@ $(function () {
             input.each(function () {
                 let newDomain = $(this).val();
                 newDomains.push(newDomain + ".");
-                alert(JSON.stringify($(this).parent("td").html()));
                 $(this).parent("td").html(newDomain);
             });
             $(this).parents("tr").find(".add, .edit").toggle();
@@ -162,7 +161,8 @@ $(function () {
         $(this).parents("tr").remove();
         $(".add-new.black-list").removeAttr("disabled");
 
-        let input = $(this).parents("tr").find('td:first-child').html() + ".";
+        let input = $(this).parents("tr").find('td:first-child').html();
+        if (!input.endsWith(".")) input += ".";
 
         chrome.runtime.sendMessage({
                 action: "delete",
@@ -177,7 +177,8 @@ $(function () {
         $(this).parents("tr").remove();
         $(".add-new.white-list").removeAttr("disabled");
 
-        let input1 = $(this).parents("tr").find('td:first-child').html() + ".";
+        let input1 = $(this).parents("tr").find('td:first-child').html();
+        if (!input1.endsWith(".")) input1 += ".";
         chrome.runtime.sendMessage({
                 action: "deleteFromWhitelist",
                 domainsForWlDeletion: [input1]
