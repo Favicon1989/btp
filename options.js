@@ -212,13 +212,14 @@ $(function () {
         let out = [];
         for (var domainName in counts) {
             if (counts.hasOwnProperty(domainName)) {
-                let category = counts[domainName].category;
-                out.push([domainName, counts[domainName].count, category]);
+                let currCategory = counts[domainName].category;
+                let currCount = counts[domainName].count;
+                out.push([domainName, counts[domainName].count, currCategory]);
 
-                if (!!categoryCounts[category]) {
-                    categoryCounts[category] = categoryCounts[category] + 1;
+                if (!!categoryCounts[currCategory]) {
+                    categoryCounts[currCategory] = categoryCounts[currCategory] + currCount;
                 } else {
-                    categoryCounts[category] = 1;
+                    categoryCounts[currCategory] = currCount;
                 }
             }
         }
@@ -235,7 +236,6 @@ $(function () {
         chartData.sort(function (a, b) {
             return b['y'] - a['y'];
         });
-
 
         $('#statisticListTableBody').html(out.map(statisticObj => {
             return '<tr><td>' + statisticObj[0] + '</td><td>' + statisticObj[1] + '</td><td>' + statisticObj[2] + '</td><td><a href="#"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td></tr>';

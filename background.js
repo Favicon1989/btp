@@ -167,15 +167,15 @@ chrome.storage.sync.get('alertsCount', function (storage) {
 });
 var db = new Dexie("alertsDB");
 
-// for db recreation uncomment
+// for db recreation
 
-// db.delete().then(() => {
-//     alert("Database successfully deleted");
-// }).catch((err) => {
-//     alert("Could not delete database");
-// }).finally(() => {
-// });
-// db = new Dexie("alertsDB");
+db.delete().then(() => {
+    alert("Database successfully deleted");
+}).catch((err) => {
+    alert("Could not delete database");
+}).finally(() => {
+});
+db = new Dexie("alertsDB");
 
 db.version(1).stores({
     domains: "++id,name,detectionDate,category"
