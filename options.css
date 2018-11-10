@@ -68,6 +68,12 @@ body {
     border-radius: 5px;
 }
 
+.table-wrapper.statistic-list {
+    background: rgb(255, 255, 255);
+    border-radius: 5px;
+    width: 50%;
+}
+
 .table-wrapper {
     margin: 30px auto;
     padding: 15px;

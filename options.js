@@ -187,4 +187,34 @@ $(function () {
 
             })
     });
+
+    // STATISTIC table
+    var db = new Dexie("alertsDB");
+    db.version(1).stores({
+        domains: "++id,name,detectionDate"
+    });
+
+    db.domains.toArray().then(function (domains) {
+        var counts = {};
+
+        for (var i = 0; i < domains.length; i++) {
+            var name = domains[i].name;
+            counts[name] = counts[name] ? counts[name] + 1 : 1;
+        }
+
+        let out = [];
+        for (var domainName in counts) {
+            if (counts.hasOwnProperty(domainName)) {
+                out.push([domainName, counts[domainName]])
+            }
+        }
+
+        out.sort(function (a, b) {
+            return b[1] - a[1];
+        });
+
+        $('#statisticListTableBody').html(out.map(statisticObj => {
+            return '<tr><td>' + statisticObj[0] + '</td><td>' + statisticObj[1] + '</td></tr>';
+        }));
+    });
 });
