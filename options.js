@@ -196,6 +196,7 @@ $(function () {
 
     db.domains.toArray().then(function (domains) {
         var counts = {};
+        var categoryCounts = {};
 
         for (var i = 0; i < domains.length; i++) {
             var name = domains[i].name;
@@ -211,16 +212,78 @@ $(function () {
         let out = [];
         for (var domainName in counts) {
             if (counts.hasOwnProperty(domainName)) {
-                out.push([domainName, counts[domainName].count, counts[domainName].category])
+                let category = counts[domainName].category;
+                out.push([domainName, counts[domainName].count, category]);
+
+                if (!!categoryCounts[category]) {
+                    categoryCounts[category] = categoryCounts[category] + 1;
+                } else {
+                    categoryCounts[category] = 1;
+                }
             }
         }
-
+        let chartData = [];
+        for (var category in categoryCounts) {
+            if (categoryCounts.hasOwnProperty(category)) {
+                chartData.push({name: category, y: categoryCounts[category]});
+            }
+        }
         out.sort(function (a, b) {
             return b[1] - a[1];
         });
 
+        chartData.sort(function (a, b) {
+            return b['y'] - a['y'];
+        });
+
+
         $('#statisticListTableBody').html(out.map(statisticObj => {
             return '<tr><td>' + statisticObj[0] + '</td><td>' + statisticObj[1] + '</td><td>' + statisticObj[2] + '</td><td><a href="#"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td></tr>';
         }));
+        createChart(chartData);
     });
+
+    function createChart(data) {
+
+        Highcharts.chart('categoryChart', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: 0,
+                plotShadow: false
+            },
+            title: {
+                text: '<br>Categories<br>',
+                align: 'center',
+                verticalAlign: 'top',
+                y: 40
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    dataLabels: {
+                        enabled: true,
+                        distance: -50,
+                        style: {
+                            fontWeight: 'bold',
+                            color: 'white'
+                        }
+                    },
+                    startAngle: -90,
+                    endAngle: 90,
+                    center: ['50%', '75%'],
+                    size: '110%'
+                }
+            },
+            series: [{
+                colorByPoint: true,
+                data: data,
+                type: 'pie',
+                name: 'Percentage',
+                innerSize: '50%'
+            }]
+        });
+    }
+
 });

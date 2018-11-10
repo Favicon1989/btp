@@ -75,6 +75,12 @@ body {
     width: 100%;
 }
 
+.table-wrapper.chart-list {
+    background: rgb(255, 255, 255);
+    border-radius: 5px;
+    width: 100%;
+}
+
 .table-wrapper {
     margin: 30px auto;
     padding: 15px;
