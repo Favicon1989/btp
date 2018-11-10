@@ -13,6 +13,10 @@ body {
     margin-right: 50px;
 }
 
+.description {
+    font-size: 10px;
+}
+
 .header a {
     float: left;
     color: black;
@@ -54,11 +58,20 @@ body {
     }
 }
 
+.table-wrapper.black-list {
+    background: rgba(255, 176, 103, 0.16);
+    border-radius: 5px;
+}
+
+.table-wrapper.white-list {
+    background: rgb(255, 255, 255);
+    border-radius: 5px;
+}
+
 .table-wrapper {
     margin: 30px auto;
-    background: #fff;
-    padding: 20px;
-    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    padding: 15px;
+    box-shadow: 0 1px 1px rgb(255, 255, 255);
 }
 .table-title {
     padding-bottom: 10px;
@@ -70,13 +83,10 @@ body {
 }
 .table-title .add-new {
     float: right;
-    height: 30px;
     font-weight: bold;
-    font-size: 12px;
     text-shadow: none;
-    min-width: 100px;
-    border-radius: 50px;
-    line-height: 13px;
+    border-radius: 3px;
+    line-height: 1.5;
 }
 .table-title .add-new i {
     margin-right: 4px;
@@ -91,6 +101,16 @@ table.table th i {
     font-size: 13px;
     margin: 0 5px;
     cursor: pointer;
+}
+
+td {
+    vertical-align: center;
+}
+
+tbody {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    line-height: 1.1;
 }
 table.table th:last-child {
     width: 100px;

@@ -23,13 +23,13 @@
         </div>
 
         <div class="row wrapper">
-            <div class=col-md-4>
-                <div class="table-wrapper">
+            <div class="col-md-3" style="padding-left: 5px;padding-right: 5px">
+                <div class="table-wrapper black-list">
                     <div class="table-title">
                         <div class="row">
                             <div class="col-sm-8"><h4><span class="glyphicon glyphicon-list" aria-hidden=true></span>&nbsp;Blocklist</h4></div>
                             <div class="col-sm-4">
-                                <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New
+                                <button type="button" class="btn btn-default btn-xs add-new black-list" style="font-size: x-small"><i class="fa fa-plus"></i> Add New
                                 </button>
                             </div>
                             <div class="col-sm-12">
@@ -39,7 +39,7 @@
                             </div>
                         </div>
                     </div>
-                    <table class="table table-bordered" style="font-size: x-small; line-height: 4px">
+                    <table class="table table-bordered black-list" style="font-size: x-small; line-height: 4px">
                         <thead>
                         <tr>
                             <th>Domain Name</th>
@@ -51,6 +51,49 @@
                     </table>
                 </div>
             </div>
+
+            <div class=col-md-3 style="padding-left: 5px;padding-right: 5px">
+                <div class="table-wrapper white-list">
+                    <div class="table-title">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <h4><span class="glyphicon glyphicon-list" aria-hidden=true></span>&nbsp;Allowed list</h4>
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="button" class="btn btn-default btn-xs add-new white-list" style="font-size: x-small"><i class="fa fa-plus"></i> Add New
+                                </button>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class=description>Manuall whitelist.
+                                </div>
+                            </div>
+                            <div class="col-sm-6 btn-group-xs">
+                                <button type="button" class="btn btn-xs btn-default" style="font-size: x-small"><span class="glyphicon glyphicon-sort-by-alphabet" aria-hidden=true></span> Sort
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered white-list" style="font-size: x-small; line-height: 4px">
+                        <thead>
+                        <tr>
+                            <th>Domain Name</th>
+                            <th style="text-align: center">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="manualWhitelistTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-2 pull-right" style="padding: 20px; font-size: small">
+                <div class="data-container matched">
+
+                    <div class=no-requests>Last update: <br><span id="lastUpdate"></span></div>
+                </div>
+                <div class=actions><button id="refreshContent" style="font-size: smaller" class="refresh btn btn-xs btn-default"><span class="glyphicon glyphicon-refresh" aria-hidden=true></span> Update now</button> </div>
+                <div class=description> Get Akamai blocklist.</div>
+            </div>
+
         </div>
     </div>
 </div>

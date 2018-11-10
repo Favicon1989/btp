@@ -1,6 +1,7 @@
 var domainsMap = {};
 var requestsMade = {};
 var manualBlocks = {};
+var manualWhitelist = {};
 
 // on create new tab
 chrome.tabs.onCreated.addListener(function (details) {
@@ -46,18 +47,25 @@ function GetLast10UniqueRequests(tabId) {
 }
 
 // save changes from the popup
-function Save(newDomains, tabId) {
+function Save(newDomains) {
     newDomains.forEach(dom => {
-        delete domainsMap[dom];
-        domainsMap[dom] = true;
         manualBlocks[dom] = true;
     })
 }
 
+function SaveToWhitelist(newDomains) {
+    newDomains.forEach(dom => {
+        manualWhitelist[dom] = true;
+    })
+}
+function DeleteFromWhitelist(domainsForDeletion) {
+    domainsForDeletion.forEach(dom => {
+        delete manualWhitelist[dom]
+    })}
+
 // delete some domain from the list
 function Delete(domainsForDeletion) {
     domainsForDeletion.forEach(dom => {
-        delete domainsMap[dom];
         delete manualBlocks[dom]
     });
 }
@@ -78,6 +86,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, callback) {
         callback(Delete(request.domainsForDeletion));
     } else if (request.action === "manual") {
         callback(GetManual());
+    } else if (request.action === "reload") {
+        callback(readFromFile());
+    } else if (request.action === "manualWhitelist") {
+        callback(GetManualWhitelist());
+    } else if (request.action === "saveToWhitelist") {
+        callback(SaveToWhitelist(request.newWlDomains));
+    } else if (request.action === "deleteFromWhitelist") {
+        callback(DeleteFromWhitelist(request.domainsForWlDeletion));
     }
 });
 
@@ -153,18 +169,25 @@ db.version(1).stores({
 });
 
 // read from file into lines
-chrome.runtime.getPackageDirectoryEntry(function (root) {
-    root.getFile("domains.dat", {}, function (fileEntry) {
-        fileEntry.file(function (file) {
-            var reader = new FileReader();
-            reader.onloadend = function (e) {
-                var lines = e.target.result.split('\n');
-                lines.forEach(dom => domainsMap[dom] = true);
-            };
-            reader.readAsText(file);
+function readFromFile() {
+    chrome.runtime.getPackageDirectoryEntry(function (root) {
+        root.getFile("domains.dat", {}, function (fileEntry) {
+            fileEntry.file(function (file) {
+                var reader = new FileReader();
+                reader.onloadend = function (e) {
+                    var lines = e.target.result.split('\n');
+                    lines.forEach(dom => domainsMap[dom] = true);
+                };
+                reader.readAsText(file);
+            });
         });
     });
-});
+}
+
+function GetManualWhitelist() {
+    return {"made": Object.keys(manualWhitelist)};
+}
+
 
 function extractHostname(url) {
     var hostname;
@@ -188,7 +211,7 @@ function extractHostname(url) {
 }
 
 var blacklistContains = function (value) {
-    return domainsMap[value] === true;
+    return (domainsMap[value] === true || manualBlocks[value] === true) && !manualWhitelist[value];
 };
 
 // listen to the link changes in all the tabs
@@ -212,6 +235,9 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
             updateProperties = {};
             updateProperties.url = 'https://www.akamai.com/';
             chrome.tabs.update(details.tabId, updateProperties, function () {
+                if (chrome.runtime.lastError) {
+                    console.log(chrome.runtime.lastError.message);
+                }
             });
 
             // create notification
