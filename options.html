@@ -1,128 +1,75 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Akamai Browser Threat Protector - options</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round|Open+Sans">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href=bootstrap.min.css rel=stylesheet>
-    <link href=options.css rel=stylesheet>
-    <script src="dexie.js"></script>
-    <script src="jquery-3.1.0.min.js"></script>
-    <script src="bootstrap.min.js"></script>
-    <script src="options.js"></script>
+<html lang=en>
+   <head>
+      <title>Akamai Browser Threat Protector - options</title>
+      <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>   
+      <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-</head>
-<body>
-<div class="shadow">
-    <div class="container">
-        <div class="header" style="border-bottom:1px solid #eee">
-            <img src="download.png" alt="logo" height="100"/>
-            <h2>Browser Threat Protector</h2>
-        </div>
+      <link href=bootstrap.min.css rel=stylesheet>
+      <link href=pnotify.custom.min.css rel=stylesheet>
+      <link href=../css/options.css rel=stylesheet>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+      <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
 
-        <div class="row wrapper">
-            <div class="col-md-3" style="padding-left: 5px;padding-right: 5px">
-                <div class="table-wrapper black-list">
-                    <div class="table-title">
-                        <div class="row">
-                            <div class="col-sm-8"><h4><span class="glyphicon glyphicon-list" aria-hidden=true></span>&nbsp;Blocklist</h4></div>
-                            <div class="col-sm-4">
-                                <button type="button" class="btn btn-default btn-xs add-new black-list" style="font-size: x-small"><i class="fa fa-plus"></i> Add New
-                                </button>
-                            </div>
-                            <div class="col-sm-12">
-                                <div class=description>This is a manually added list of domains whose content will be
-                                    prevented to load.
-                                </div>
-                            </div>
-                        </div>
+   </head>
+   <body>
+      <div class=container>
+            <a class="logo">
+                    <img src="download.png" text=BTP> Browser Threat Protector
+            </a>
+
+
+            <div class="row usp">
+                    <div>
+                        <h3>Blocking statistics</h3>
+        
+                        <div class="modal-body">
+                                <table id="myTable" style=" font-size: small" class="table table-striped display" width="100%">
+                                    <thead hidden>
+                                    <tr class="myTable">
+                                        <th style="text-align: center; width: 35%" width="35%">Key</th>
+                                        <th style="text-align: center; width: 65%" width="65%">Value</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>  
                     </div>
-                    <table class="table table-bordered black-list" style="font-size: x-small; line-height: 4px">
-                        <thead>
-                        <tr>
-                            <th>Domain Name</th>
-                            <th style="text-align: center">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody id="manualTableBody">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                 </div>
 
-            <div class=col-md-3 style="padding-left: 5px;padding-right: 5px">
-                <div class="table-wrapper white-list">
-                    <div class="table-title">
-                        <div class="row">
-                            <div class="col-sm-8">
-                                <h4><span class="glyphicon glyphicon-list" aria-hidden=true></span>&nbsp;Allowed list</h4>
-                            </div>
-                            <div class="col-sm-4">
-                                <button type="button" class="btn btn-default btn-xs add-new white-list" style="font-size: x-small"><i class="fa fa-plus"></i> Add New
-                                </button>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class=description>Manuall whitelist.
-                                </div>
-                            </div>
-                            <div class="col-sm-6 btn-group-xs">
-                                <button type="button" class="btn btn-xs btn-default" style="font-size: x-small"><span class="glyphicon glyphicon-sort-by-alphabet" aria-hidden=true></span> Sort
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <table class="table table-bordered white-list" style="font-size: x-small; line-height: 4px">
-                        <thead>
-                        <tr>
-                            <th>Domain Name</th>
-                            <th style="text-align: center">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody id="manualWhitelistTableBody">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class=col-md-6 style="padding-left: 5px;padding-right: 5px">
-                <div class="table-wrapper statistic-list pull-left">
-                    <div class="table-title">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <h4 style="text-align: center"><span class="glyphicon glyphicon-list" aria-hidden=true></span>&nbsp;Most frequent malicious sites from this browser.</h4>
-                            </div>
-                        </div>
-                    </div>
-                    <table class="table table-bordered statistic-list" style="font-size: x-small; line-height: 4px">
-                        <thead>
-                        <tr>
-                            <th>Domain Name</th>
-                            <th>Visit Attempts</th>
-                        </tr>
-                        </thead>
-                        <tbody id="statisticListTableBody">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                  <hr>
 
-            <div style="padding: 20px; font-size: small; position: fixed; right: 0; top: 0">
-                <div class="data-container matched">
 
-                    <div class=no-requests>Last update: <br><span id="lastUpdate"></span></div>
-                </div>
-                <div class=actions><button id="refreshContent" style="font-size: smaller" class="refresh btn btn-xs btn-default"><span class="glyphicon glyphicon-refresh" aria-hidden=true></span> Update now</button> </div>
-                <div class=description> Get Akamai blocklist.</div>
+         <div class="row wrapper">
+            <div class=col-md-4>
+               <h2><span class="glyphicon glyphicon-list" aria-hidden=true></span> Blocklist</h2>
+               <div class="data-container matchlist"><textarea id=matchlist class=form-control spellcheck=false></textarea></div>
+               <div class=actions><button id=save class="btn btn-default"><span class="glyphicon glyphicon-save" aria-hidden=true></span> Save</button> <button id=sort class="btn btn-default"><span class="glyphicon glyphicon-sort-by-alphabet" aria-hidden=true></span> Sort by name</button></div>
+               <div class=description>This is a manually added list of domains whose content will be prevented to load. </span></div>
             </div>
-        </div>
-
-    </div>
-    <div class="row panel-footer footer" style="text-align: center; bottom: 0; position: fixed; width:100%; right: 15px; alignment: center">
-        <div class=col-md-12>
-            <a href=https://www.akamai.com/us/en/products/cloud-security/enterprise-threat-protector.jsp target=_blank>Akamai Browser Threat Protector</a>
-        </div>
-    </div>
-</div>
-</body>
+            <div class=col-md-4>
+               <h2><span class="glyphicon glyphicon-remove" aria-hidden=true></span> Update Content</h2>
+               <div class="data-container matched">
+                  
+                  <div class=no-requests>Last update: 11/08/2018 14:33:21</div>
+               </div>
+               <div class=actions><button class="refresh btn btn-default"><span class="glyphicon glyphicon-refresh" aria-hidden=true></span> Update now</button> </div>
+               <div class=description> Get Akamai blocklist. </span></div>
+            </div>
+            <div class=col-md-4>
+                    <h2><span class="glyphicon glyphicon-list" aria-hidden=true></span> Allowed Domains</h2>
+                    <div class="data-container matchlist"><textarea id=matchlist class=form-control spellcheck=false></textarea></div>
+                    <div class=actions><button id=save class="btn btn-default"><span class="glyphicon glyphicon-save" aria-hidden=true></span> Save</button> <button id=sort class="btn btn-default"><span class="glyphicon glyphicon-sort-by-alphabet" aria-hidden=true></span> Sort by name</button></div>
+                    <div class=description>Manuall whitelist.</span></div>
+           </div>
+         </div>         
+         
+         <hr>
+         <div class="row footer">
+            <div class=col-md-12><a href=https://www.akamai.com/us/en/products/cloud-security/enterprise-threat-protector.jsp target=_blank>Akamai Browser Threat Protector</div>
+         </div>
+         <hr>
+      </div>
+      <script src=jquery.min.js></script><script src=bootstrap.min.js></script><script src=pnotify.custom.min.js></script><script src=.options.js></script>
+   </body>
 </html>
